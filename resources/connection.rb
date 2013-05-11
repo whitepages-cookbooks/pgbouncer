@@ -18,6 +18,7 @@
 #
 
 actions :setup, :teardown, :start, :restart, :stop
+default_action :setup
 
 attribute :db_alias, :kind_of => String, :name_attribute => true
 attribute :db_host, :kind_of => String, :required => true

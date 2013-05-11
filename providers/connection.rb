@@ -104,6 +104,7 @@ action :setup do
     end
   end
 
+  new_resource.updated_by_last_action(true)
 end
 
 action :teardown do
@@ -116,4 +117,5 @@ action :teardown do
     action :delete
   end
 
+  new_resource.updated_by_last_action(true)
 end
