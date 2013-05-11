@@ -1,0 +1,14 @@
+# Rotate postgresql log files
+
+<%= @log_dir %>/pgbouncer-<%= @db_alias %>.log {
+  daily
+  copytruncate
+  missingok
+  start 0
+  rotate 7
+  compress
+  sharedscripts
+  postrotate
+    /bin/kill -HUP `cat <%= @pid_dir %>/pgbouncer-<%= @db_alias %>.pid 2>/dev/null` 2> /dev/null || true
+  endscript
+}

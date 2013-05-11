@@ -1,0 +1,19 @@
+description "PgBouncer PostgreSQL connection pool for db alias <%= @db_alias %>"
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+env USER=<%= @user %>
+env RUNDIR=<%= @pid_dir %>
+env DAEMON="/usr/bin/pgbouncer"
+env DAEMON_OPTS="-d -R /etc/pgbouncer/pgbouncer-<%= @db_alias %>.ini"
+
+pre-start script
+    mkdir -p $RUNDIR || true
+    chown $USER:$USER $RUNDIR || true
+end script
+
+expect daemon
+respawn
+
+exec start-stop-daemon --start --quiet --pidfile $RUNDIR/$JOB.pid --chuid $USER \
+		--exec $DAEMON -- $DAEMON_OPTS || true
