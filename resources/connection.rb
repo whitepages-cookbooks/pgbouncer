@@ -32,8 +32,8 @@ attribute :listen_port, :kind_of => String
 
 attribute :user, :kind_of => String, :default => 'postgres'
 attribute :group, :kind_of => String, :default => 'postgres'
-attribute :log_dir, :kind_of => String, :default => '/opt/wp/pgbouncer'
-attribute :socket_dir, :kind_of => String, :default => '/opt/wp/db_sockets'
+attribute :log_dir, :kind_of => String, :default => '/var/log/pgbouncer'
+attribute :socket_dir, :kind_of => String, :default => '/etc/pgbouncer/db_sockets'
 attribute :pid_dir, :kind_of => String, :default => '/var/run/pgbouncer'
 
 attribute :pool_mode, :kind_of => String, :default => 'transaction'

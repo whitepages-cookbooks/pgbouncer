@@ -20,9 +20,9 @@
 # NOTE:
 # This is an example of how to leverage the included resource
 
-pgbouncer_connection cxn_name do
+pgbouncer_connection "database.example.com_ro" do
   db_host "database.example.com"
-  db_port 6432
+  db_port "6432"
   db_name "test_database"
   userlist "readwrite_user" => "md500000000000000000000000000000000", "readonly_user" => "md500000000000000000000000000000000"
   max_client_conn 100
