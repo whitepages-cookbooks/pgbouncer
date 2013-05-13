@@ -23,21 +23,24 @@ def initialize(*args)
 end
 
 action :start do
-  service "pgbouncer-#{new_resource.db_alias}" do
+  service "pgbouncer-#{new_resource.db_alias}-start" do
+    service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
     provider Chef::Provider::Service::Upstart
     action [:enable, :start]
   end
 end
 
 action :restart do
-  service "pgbouncer-#{new_resource.db_alias}" do
+  service "pgbouncer-#{new_resource.db_alias}-restart" do
+    service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
     provider Chef::Provider::Service::Upstart
     action [:enable, :restart]
   end
 end
 
 action :stop do
-  service "pgbouncer-#{new_resource.db_alias}" do
+  service "pgbouncer-#{new_resource.db_alias}-stop" do
+    service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
     provider Chef::Provider::Service::Upstart
     action :stop
   end

@@ -30,8 +30,8 @@ attribute :userlist, :kind_of => Hash, :required => true
 attribute :listen_addr, :kind_of => String
 attribute :listen_port, :kind_of => String
 
-attribute :user, :kind_of => String, :default => 'postgres'
-attribute :group, :kind_of => String, :default => 'postgres'
+attribute :user, :kind_of => String, :default => 'pgbouncer'
+attribute :group, :kind_of => String, :default => 'pgbouncer'
 attribute :log_dir, :kind_of => String, :default => '/var/log/pgbouncer'
 attribute :socket_dir, :kind_of => String, :default => '/etc/pgbouncer/db_sockets'
 attribute :pid_dir, :kind_of => String, :default => '/var/run/pgbouncer'
