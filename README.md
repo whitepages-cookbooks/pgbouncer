@@ -97,6 +97,7 @@ License and Author(s)
 - Author:: Owyn Richen (<orichen@whitepages.com>)
 - Author:: Jack Foy (<jfoy@whitepages.com>)
 - Author:: Paul Kohan (<pkohan@whitepages.com>)
+- Author:: Brian Engelman (<bengelman@whitepages.com>)
 
 Copyright 2010-2013, Whitepages Inc.
 
