@@ -73,6 +73,24 @@ example
 This recipe is here to give an example of how to use the resource, as well as the one that
 gets exercised in the spec/ tests.
 
+Testing
+=======
+
+This cookbook has been "Tested in Production"&trademark;, but also has some basic RSpec tests
+that can be executed.
+
+**NOTE**: because Chef has cookbook naming expectations, the root repo expects to be in a folder
+named 'pgbouncer'.
+
+     bundle install
+     bundle exec rake spec
+
+Additionally, it's been run through Foodcritic to ensure we're at least not egregiously violating
+something.
+
+	bundle install
+	bundle exec rake foodcritic
+
 License and Author(s)
 =====================
 
