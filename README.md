@@ -76,7 +76,7 @@ gets exercised in the spec/ tests.
 Testing
 =======
 
-This cookbook has been "Tested in Production"&trademark;, but also has some basic RSpec tests
+This cookbook has been "Tested in Production"&trade;, but also has some basic RSpec tests
 that can be executed.
 
 **NOTE**: because Chef has cookbook naming expectations, the root repo expects to be in a folder
