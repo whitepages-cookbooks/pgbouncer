@@ -91,6 +91,13 @@ something.
 	bundle install
 	bundle exec rake foodcritic
 
+To see the installation end to end, we've also got a rake task that spins up a [chef-zero](https://github.com/jkeiser/chef-zero)
+local instance, uploads the cookbooks via berkshelf, and spins up a vagrant instance that pulls the data down.  We use a stock
+ubuntu cloud instance.
+
+       bundle install
+       bundle exec rake vagrant_startup
+
 License and Author(s)
 =====================
 
@@ -99,7 +106,7 @@ License and Author(s)
 - Author:: Paul Kohan (<pkohan@whitepages.com>)
 - Author:: Brian Engelman (<bengelman@whitepages.com>)
 
-Copyright 2010-2013, Whitepages Inc.
+Copyright 2010-2013, [Whitepages Inc.](http://www.whitepages.com/)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
