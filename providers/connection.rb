@@ -117,7 +117,9 @@ action :teardown do
     "/etc/init/pgbouncer-#{new_resource.db_alias}.conf" => 'etc/pgbouncer/pgbouncer.conf',
     "/etc/logrotate.d/pgbouncer-#{new_resource.db_alias}" => 'etc/logrotate.d/pgbouncer-logrotate.d'
   }.each do |destination_file, source_template|
-    action :delete
+    file destination_file do
+      action :delete
+    end
   end
 
   new_resource.updated_by_last_action(true)
