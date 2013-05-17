@@ -4,7 +4,7 @@ stop on runlevel [!2345]
 
 env USER=<%= @user %>
 env RUNDIR=<%= @pid_dir %>
-env DAEMON="/usr/bin/pgbouncer"
+env DAEMON="/usr/sbin/pgbouncer"
 env DAEMON_OPTS="-d -R /etc/pgbouncer/pgbouncer-<%= @db_alias %>.ini"
 
 pre-start script

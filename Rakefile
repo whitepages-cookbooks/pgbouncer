@@ -70,7 +70,7 @@ namespace :berks do
     valid = `cd test; knife cookbook list --key .chef/test.pem | grep pgbouncer | wc -l; cd ..`
     valid = valid.gsub(/\s+/,"").to_i
     if valid == 0
-       puts "WTF?!?"
+       puts "Ruh roh..."
     else
        puts "You're g2g"
     end
