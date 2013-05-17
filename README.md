@@ -13,36 +13,50 @@ Chef 0.7+
 
 Platform
 --------
+Tested:
+* Ubuntu
 
-* Ubuntu (tested)
-* Debian (should work but untested)
-* RHEL, Centos, etc (untested)
+Untested:
+* Debian (should work)
+* RHEL, Centos, etc
 
-Cookbooks
+Dependencies
 ---------
 
-It requires the 'apt' cookbook in order to function
+'apt' cookbook
 
 Resources/Providers
 ===================
 
-This exposes a single resource/provider pair, referred as `pgbouncer_connection`.  A basic 
-example of it's use can be found in `recipes/example.rb`, but we'll outline it here too.
+This cookbook exposes a single resource/provider pair, referred as `pgbouncer_connection`.  A basic 
+example of its use can be found in `recipes/example.rb`, and is outlined below.
 
 `pgbouncer_connection`
 ----------------------
 
-Sets up and starts an Upstart service for pgbouncer, for the database alias you configure it for.
+Sets up an Upstart service for pgbouncer against a single database alias, then starts the service.
+Multiple aliases may be supported on a single host.
 
 ### Actions
-- :setup: set up and configure a pgbouncer service for the database alias provided with included parameters (default action)
-- :start: start a pgbouncer service for the database alias provided
-- :stop: stop a pgbouncer service for the database alias provided
-- :teardown: deletes the configuration files associated with the database alias provided
+- :setup: configure a pgbouncer service for the specified database alias (default action)
+- :start: start the configured pgbouncer service
+- :stop: stop the configured pgbouncer service
+- :teardown: delete the configuration (FIXME: may not be comprehensive)
 
 ### Examples
-    # setup and start a connection pool
+    # setup and start a read-only connection pool
     pgbouncer_connection "database_example_com_ro" do
+      db_host "database.example.com"
+      db_port "6432"
+      db_name "test_database"
+      userlist "readonly_user" => "md500000000000000000000000000000000"
+      max_client_conn 100
+      default_pool_size 20
+      action [:setup, :start]
+    end
+
+    # setup and start a read-write connection pool
+    pgbouncer_connection "database_example_com_rw" do
       db_host "database.example.com"
       db_port "6432"
       db_name "test_database"
@@ -65,28 +79,25 @@ Recipes
 default
 -------
 
-This recipe is empty to hopefully help indicate that this is a resource-only cookbook.
+Empty: this is a resource-only cookbook
 
 example
 -------
 
-This recipe is here to give an example of how to use the resource, as well as the one that
-gets exercised in the spec/ tests.
+Example of how to use the resource; also exercised in the spec/ tests
 
 Testing
 =======
 
-This cookbook has been "Tested in Production"&trade;, but also has some basic RSpec tests
-that can be executed.
+This cookbook has been "Tested in Production"&trade;, but also has some basic RSpec tests.
 
-**NOTE**: because Chef has cookbook naming expectations, the root repo expects to be in a folder
+**NOTE**: because Chef 10 has cookbook naming expectations, the root repo expects to be in a folder
 named 'pgbouncer'.
 
      bundle install
      bundle exec rake spec
 
-Additionally, it's been run through Foodcritic to ensure we're at least not egregiously violating
-something.
+The cookbook is clean under FoodCritic.
 
 	bundle install
 	bundle exec rake foodcritic
