@@ -86,6 +86,23 @@ action :setup do
     end
   end
 
+  # resources only surface defaults when actually hitting accessors
+  # so we need to fetch them explicitly...
+  # This is somewhat ugly and could break but Chef seems to generate
+  # _set_or_return_* methods for every attribute, so iterating over
+  # the methods seems to be the best way to find the declared attributes
+  #
+  properties = new_resource.methods.inject({}) do |memo, method|
+    next memo unless method.to_s =~ /\_set\_or\_return_.*/
+
+    property = method.to_s.gsub("_set_or_return_","")
+    value = new_resource.send(property.to_sym)
+    next memo if value.nil?
+
+    memo[property] = value
+    memo
+  end
+
   # build the userlist, pgbouncer.ini, upstart conf and logrotate.d templates
   {
     "/etc/pgbouncer/userlist-#{new_resource.db_alias}.txt" => 'etc/pgbouncer/userlist.txt.erb',
@@ -96,6 +113,7 @@ action :setup do
     ## We are setting destination_file to a duplicate of key because the hash
     ## key is frozen and immutable.
     destination_file = key.dup
+
     template destination_file do
       cookbook 'pgbouncer'
       source source_template
@@ -103,7 +121,7 @@ action :setup do
       group new_resource.group
       mode 0644
       notifies :restart, "service[pgbouncer-#{new_resource.db_alias}]"
-      variables(new_resource.to_hash)
+      variables(properties)
     end
   end
 

@@ -107,6 +107,12 @@ namespace :vagrant do
     shell_output "cd test; vagrant destroy --force; cd .."
     puts "...complete"
   end
+
+  task :provision do
+    puts "Reprovisioning the vagrant default instance..."
+    shell_output "cd test; vagrant provision; cd .."
+    puts "...complete"
+  end
 end
 
 desc "Spins up a chef-zero server, deploys the cookbook via berkshelf and sets up a vagrant host to fetch the cookbook"
@@ -115,5 +121,14 @@ task :vagrant_startup do
   Rake::Task['chef_zero:start'].invoke
   Rake::Task['berks:upload'].invoke
   Rake::Task['vagrant:up'].invoke
+  Rake::Task['chef_zero:stop'].invoke
+end
+
+desc "Spins up a chef-zero server, deploys the cookbook via berkshelf and provisions a vagrant host to fetch the cookbook"
+task :vagrant_reprovision do
+  puts "starting up"
+  Rake::Task['chef_zero:start'].invoke
+  Rake::Task['berks:upload'].invoke
+  Rake::Task['vagrant:provision'].invoke
   Rake::Task['chef_zero:stop'].invoke
 end
