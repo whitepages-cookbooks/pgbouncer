@@ -18,7 +18,7 @@ task :foodcritic do
   puts "...complete"
 end
 
-task :default => 'foodcritic'
+task :default => ['spec', 'foodcritic']
 
 desc "Runs spec tests"
 
