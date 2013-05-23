@@ -23,7 +23,7 @@ Vagrant.configure("2") do |config|
   # This uses the vagrant-chefzero plugin built by Whitepages, which can
   # be found here: http://TODO!!!!!
   #
-  chef_zero_ip = '33.33.33.10'
+  chef_zero_ip = '33.33.33.9'
   chef_zero_port = 8889
 
   config.vm.define :chefzero do |chefzero|
@@ -34,7 +34,6 @@ Vagrant.configure("2") do |config|
       cz.ip = chef_zero_ip
       cz.port = chef_zero_port
       cz.setup do |p|
-        p.import_data_bag(users: 'global')
         p.import_berkshelf_cookbooks
       end
     end
@@ -50,10 +49,12 @@ Vagrant.configure("2") do |config|
   # HTTP instead of HTTPS depending on your configuration. Also change the
   # validation key to validation.pem.
   #
-  config.vm.provision :chef_client do |chef|
-    chef.chef_server_url = "http://#{chef_zero_ip}:#{chef_zero_port}"
-    chef.validation_key_path = ".chef/test.pem"
+  config.vm.define :target do |target|
+    target.vm.provision :chef_client do |chef|
+      chef.chef_server_url = "http://#{chef_zero_ip}:#{chef_zero_port}"
+      chef.validation_key_path = ".chef/test.pem"
 
-    chef.run_list = "recipe[pgbouncer::example]"
+      chef.run_list = "recipe[pgbouncer::example]"
+    end
   end
 end
