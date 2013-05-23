@@ -1,4 +1,4 @@
-PGBouncer Cookbook
+PGBouncer Cookbook [![Build Status](https://travis-ci.org/whitepages-cookbooks/pgbouncer.png?branch=master)](https://travis-ci.org/whitepages-cookbooks/pgbouncer)
 ==================
 
 This cookbook provides a [Chef LWRP](http://docs.opscode.com/lwrp.html) that sets up 
