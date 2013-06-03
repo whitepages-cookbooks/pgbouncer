@@ -103,8 +103,8 @@ The cookbook is clean under FoodCritic.
 	bundle exec rake foodcritic
 
 To see the installation end to end, we've also got a rake task that spins up a [chef-zero](https://github.com/jkeiser/chef-zero)
-local instance, uploads the cookbooks via berkshelf, and spins up a vagrant instance that pulls the data down.  We use a stock
-ubuntu cloud instance.
+local instance, uploads the cookbooks via berkshelf, and spins up a vagrant instance that pulls the data down.  This is using a new
+Vagrant plugin, created here at Whitepages, called [vagrant-chefzero](https://github.com/whitepages/vagrant-chefzero/). 
 
        bundle install
        bundle exec rake vagrant_startup
