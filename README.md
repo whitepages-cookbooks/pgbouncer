@@ -94,20 +94,21 @@ This cookbook has been "Tested in Production"&trade;, but also has some basic RS
 **NOTE**: because Chef 10 has cookbook naming expectations, the root repo expects to be in a folder
 named 'pgbouncer'.
 
-     bundle install
-     bundle exec rake spec
+      bundle install
+      bundle exec rake spec
 
 The cookbook is clean under FoodCritic.
 
-	bundle install
-	bundle exec rake foodcritic
+      bundle install
+      bundle exec rake foodcritic
 
 To see the installation end to end, we've also got a rake task that spins up a [chef-zero](https://github.com/jkeiser/chef-zero)
 local instance, uploads the cookbooks via berkshelf, and spins up a vagrant instance that pulls the data down.  This is using a new
-Vagrant plugin, created here at Whitepages, called [vagrant-chefzero](https://github.com/whitepages/vagrant-chefzero/). 
+Vagrant plugin, created here at Whitepages, called [vagrant-chefzero](https://github.com/whitepages/vagrant-chefzero/).
 
-       bundle install
-       bundle exec rake vagrant_startup
+      vagrant plugin install vagrant-chefzero
+      bundle install
+      bundle exec rake vagrant_startup
 
 License and Author(s)
 =====================
