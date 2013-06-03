@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
   # This uses the vagrant-chefzero plugin built by Whitepages, which can
-  # be found here: http://TODO!!!!!
+  # be found here: https://github.com/whitepages/vagrant-chefzero/
   #
   chef_zero_ip = '33.33.33.9'
   target_ip = '33.33.33.10'
