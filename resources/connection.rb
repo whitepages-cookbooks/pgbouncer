@@ -30,6 +30,8 @@ attribute :userlist, :kind_of => Hash, :required => true
 attribute :listen_addr, :kind_of => String
 attribute :listen_port, :kind_of => String
 
+attribute :auth_type, :kind_of => String :default => 'md5'
+
 attribute :user, :kind_of => String, :default => 'pgbouncer'
 attribute :group, :kind_of => String, :default => 'pgbouncer'
 attribute :log_dir, :kind_of => String, :default => '/var/log/pgbouncer'
