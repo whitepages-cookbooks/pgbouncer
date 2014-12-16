@@ -25,6 +25,7 @@ attribute :db_host, :kind_of => String, :required => true
 attribute :db_port, :kind_of => String, :required => true
 attribute :db_name, :kind_of => String, :required => true
 
+attribute :auth_type, :kind_of => String, :default => 'md5'
 attribute :userlist, :kind_of => Hash, :required => true
 
 attribute :listen_addr, :kind_of => String
