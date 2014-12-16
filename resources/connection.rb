@@ -23,7 +23,9 @@ default_action :setup
 attribute :db_alias, :kind_of => String, :name_attribute => true
 attribute :db_host, :kind_of => String, :required => true
 attribute :db_port, :kind_of => String, :required => true
-attribute :db_name, :kind_of => String, :required => true
+attribute :db_name, :kind_of => String
+
+attribute :use_db_fallback, :kind_of => [TrueClass, FalseClass], :default => false
 
 attribute :userlist, :kind_of => Hash, :required => true
 

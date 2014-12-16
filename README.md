@@ -66,6 +66,17 @@ Multiple aliases may be supported on a single host.
       action [:setup, :start]
     end
 
+    # setup and start a connection pool with database fallback (all databases)
+    pgbouncer_connection "database_example_com_fallback" do
+      db_host "database.example.com"
+      db_port "6432"
+      use_db_fallback true
+      userlist "readwrite_user" => "md500000000000000000000000000000000", "readonly_user" => "md500000000000000000000000000000000"
+      max_client_conn 100
+      default_pool_size 20
+      action [:setup, :start]
+    end
+
     # stop a connection pool
     pgbouncer_connection "database_example_com_ro" do
       action :stop
