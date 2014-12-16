@@ -41,6 +41,7 @@ attribute :max_client_conn, :kind_of => Integer, :default => 60
 attribute :default_pool_size, :kind_of => Integer, :default => 30
 attribute :min_pool_size, :kind_of => Integer, :default => 10
 attribute :reserve_pool_size, :kind_of => Integer, :default => 5
+attribute :server_round_robin, :kind_of => Integer, :default => 1
 attribute :server_idle_timeout, :kind_of => Integer, :default => 3600
 
 attribute :server_reset_query, :kind_of => String
