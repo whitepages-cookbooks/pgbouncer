@@ -1,5 +1,5 @@
-site :opscode
+source 'https://api.berkshelf.com'
 
 metadata
 
-cookbook 'apt', '~> 1.7.0'
+cookbook 'apt', '~> 2.6.1'
