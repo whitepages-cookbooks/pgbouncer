@@ -2,11 +2,11 @@ require 'spec_helper.rb'
 
 describe 'pgbouncer::example' do
   cached(:chef_run) do
-    ChefSpec::SoloRunner.new(step_into: ['pgbouncer_connection']).converge(described_recipe)
+    ChefSpec::SoloRunner.new(step_into: ['pgbouncer_instance']).converge(described_recipe)
   end
 
   it 'Setup a pgbouncer instance' do
-    expect(chef_run).to create_pgbouncer_instance('database_example_com_ro')
+    expect(chef_run).to create_pgbouncer_instance('example')
   end
 
   it 'creates the group pgbouncer' do
@@ -22,7 +22,7 @@ describe 'pgbouncer::example' do
   end
 
   it 'enables the service pgbouncer' do
-    service = chef_run.service('pgbouncer-database_example_com_ro')
+    service = chef_run.service('pgbouncer-example')
     expect(service).to do_nothing
   end
 
@@ -31,7 +31,7 @@ describe 'pgbouncer::example' do
     /etc/pgbouncer/db_sockets
     /var/log/pgbouncer
     /var/run/pgbouncer
-    /etc/pgbouncer/db_sockets/database_example_com_ro
+    /etc/pgbouncer/db_sockets/example
   ).each do |dir|
     it "creates directory #{dir}" do
       expect(chef_run).to create_directory(dir).with(
@@ -42,10 +42,10 @@ describe 'pgbouncer::example' do
   end
 
   %w(
-    /etc/pgbouncer/userlist-database_example_com_ro.txt
-    /etc/pgbouncer/pgbouncer-database_example_com_ro.ini
-    /etc/init/pgbouncer-database_example_com_ro.conf
-    /etc/logrotate.d/pgbouncer-database_example_com_ro
+    /etc/pgbouncer/userlist-example.txt
+    /etc/pgbouncer/pgbouncer-example.ini
+    /etc/init/pgbouncer-example.conf
+    /etc/logrotate.d/pgbouncer-example
   ).each do |file|
     it "creates file #{file}" do
       expect(chef_run).to create_template(file).with(
@@ -57,6 +57,6 @@ describe 'pgbouncer::example' do
   end
 
   it 'start pgbouncer instance' do
-    expect(chef_run).to start_service('pgbouncer-database_example_com_ro-start')
+    expect(chef_run).to start_service('pgbouncer-example-start')
   end
 end

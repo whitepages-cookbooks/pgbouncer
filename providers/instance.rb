@@ -23,24 +23,24 @@ def initialize(*args)
 end
 
 action :start do
-  service "pgbouncer-#{new_resource.db_alias}-start" do
-    service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
+  service "pgbouncer-#{new_resource.instance_name}-start" do
+    service_name "pgbouncer-#{new_resource.instance_name}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
     provider Chef::Provider::Service::Upstart
     action [:enable, :start]
   end
 end
 
 action :restart do
-  service "pgbouncer-#{new_resource.db_alias}-restart" do
-    service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
+  service "pgbouncer-#{new_resource.instance_name}-restart" do
+    service_name "pgbouncer-#{new_resource.instance_name}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
     provider Chef::Provider::Service::Upstart
     action [:enable, :restart]
   end
 end
 
 action :stop do
-  service "pgbouncer-#{new_resource.db_alias}-stop" do
-    service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
+  service "pgbouncer-#{new_resource.instance_name}-stop" do
+    service_name "pgbouncer-#{new_resource.instance_name}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
     provider Chef::Provider::Service::Upstart
     action :stop
   end
@@ -61,7 +61,7 @@ action :setup do
     action [:install, :upgrade]
   end
 
-  service "pgbouncer-#{new_resource.db_alias}" do
+  service "pgbouncer-#{new_resource.instance_name}" do
     provider Chef::Provider::Service::Upstart
     supports enable: true, start: true, restart: true
     action :nothing
@@ -72,7 +72,7 @@ action :setup do
     new_resource.log_dir,
     new_resource.pid_dir,
     new_resource.socket_dir,
-    ::File.expand_path(::File.join(new_resource.socket_dir, new_resource.db_alias)),
+    ::File.expand_path(::File.join(new_resource.socket_dir, new_resource.instance_name)),
     '/etc/pgbouncer'
   ].each do |dir|
     directory dir do
@@ -103,10 +103,10 @@ action :setup do
 
   # build the userlist, pgbouncer.ini, upstart conf and logrotate.d templates
   {
-    "/etc/pgbouncer/userlist-#{new_resource.db_alias}.txt" => 'etc/pgbouncer/userlist.txt.erb',
-    "/etc/pgbouncer/pgbouncer-#{new_resource.db_alias}.ini" => 'etc/pgbouncer/pgbouncer.ini.erb',
-    "/etc/init/pgbouncer-#{new_resource.db_alias}.conf" => 'etc/init/pgbouncer.conf.erb',
-    "/etc/logrotate.d/pgbouncer-#{new_resource.db_alias}" => 'etc/logrotate.d/pgbouncer-logrotate.d.erb'
+    "/etc/pgbouncer/userlist-#{new_resource.instance_name}.txt" => 'etc/pgbouncer/userlist.txt.erb',
+    "/etc/pgbouncer/pgbouncer-#{new_resource.instance_name}.ini" => 'etc/pgbouncer/pgbouncer.ini.erb',
+    "/etc/init/pgbouncer-#{new_resource.instance_name}.conf" => 'etc/init/pgbouncer.conf.erb',
+    "/etc/logrotate.d/pgbouncer-#{new_resource.instance_name}" => 'etc/logrotate.d/pgbouncer-logrotate.d.erb'
   }.each do |key, source_template|
     ## We are setting destination_file to a duplicate of key because the hash
     ## key is frozen and immutable.
@@ -118,7 +118,7 @@ action :setup do
       owner new_resource.user
       group new_resource.group
       mode 0644
-      notifies :restart, "service[pgbouncer-#{new_resource.db_alias}]"
+      notifies :restart, "service[pgbouncer-#{new_resource.instance_name}]"
       variables(properties)
     end
   end
@@ -127,10 +127,10 @@ action :setup do
 end
 
 action :teardown do
-  { "/etc/pgbouncer/userlist-#{new_resource.db_alias}.txt" => 'etc/pgbouncer/userlist.txt.erb',
-    "/etc/pgbouncer/pgbouncer-#{new_resource.db_alias}.ini" => 'etc/pgbouncer/pgbouncer.ini.erb',
-    "/etc/init/pgbouncer-#{new_resource.db_alias}.conf" => 'etc/pgbouncer/pgbouncer.conf',
-    "/etc/logrotate.d/pgbouncer-#{new_resource.db_alias}" => 'etc/logrotate.d/pgbouncer-logrotate.d'
+  { "/etc/pgbouncer/userlist-#{new_resource.instance_name}.txt" => 'etc/pgbouncer/userlist.txt.erb',
+    "/etc/pgbouncer/pgbouncer-#{new_resource.instance_name}.ini" => 'etc/pgbouncer/pgbouncer.ini.erb',
+    "/etc/init/pgbouncer-#{new_resource.instance_name}.conf" => 'etc/pgbouncer/pgbouncer.conf',
+    "/etc/logrotate.d/pgbouncer-#{new_resource.instance_name}" => 'etc/logrotate.d/pgbouncer-logrotate.d'
   }.each do |destination_file, _source_template|
     file destination_file do
       action :delete

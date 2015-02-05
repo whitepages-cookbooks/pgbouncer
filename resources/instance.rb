@@ -20,10 +20,8 @@
 actions :setup, :teardown, :start, :restart, :stop
 default_action :setup
 
-attribute :db_alias, kind_of: String, name_attribute: true
-attribute :db_host, kind_of: String, required: true
-attribute :db_port, kind_of: String, required: true
-attribute :db_name, kind_of: String, required: true
+attribute :instance_name, kind_of: String, name_attribute: true
+attribute :databases, kind_of: Array, required: true
 
 attribute :userlist, kind_of: Hash, required: true
 attribute :auth_type, kind_of: String, default: 'md5'

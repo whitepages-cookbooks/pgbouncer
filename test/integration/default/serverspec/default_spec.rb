@@ -15,7 +15,7 @@ describe 'pgbouncer::example' do
     it { should be_installed }
   end
 
-  describe service('pgbouncer-database_example_com_ro') do
+  describe service('pgbouncer-example') do
     it { should be_enabled }
   end
 
@@ -24,7 +24,7 @@ describe 'pgbouncer::example' do
     /etc/pgbouncer/db_sockets
     /var/log/pgbouncer
     /var/run/pgbouncer
-    /etc/pgbouncer/db_sockets/database_example_com_ro
+    /etc/pgbouncer/db_sockets/example
   ).each do |dir|
     describe file(dir) do
       it { should be_directory }
@@ -32,17 +32,17 @@ describe 'pgbouncer::example' do
   end
 
   %w(
-    /etc/pgbouncer/userlist-database_example_com_ro.txt
-    /etc/pgbouncer/pgbouncer-database_example_com_ro.ini
-    /etc/init/pgbouncer-database_example_com_ro.conf
-    /etc/logrotate.d/pgbouncer-database_example_com_ro
+    /etc/pgbouncer/userlist-example.txt
+    /etc/pgbouncer/pgbouncer-example.ini
+    /etc/init/pgbouncer-example.conf
+    /etc/logrotate.d/pgbouncer-example
   ).each do |f|
     describe file(f) do
       it { should be_file }
     end
   end
 
-  describe service('pgbouncer-database_example_com_ro') do
+  describe service('pgbouncer-example') do
     it { should be_running }
   end
 end
