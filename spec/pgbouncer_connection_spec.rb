@@ -5,7 +5,7 @@ describe 'pgbouncer::example' do
     ChefSpec::SoloRunner.new(step_into: ['pgbouncer_connection']).converge(described_recipe)
   end
 
-  it "Setup a pgbouncer instance" do
+  it 'Setup a pgbouncer instance' do
     expect(chef_run).to create_pgbouncer_instance('database_example_com_ro')
   end
 
@@ -17,7 +17,7 @@ describe 'pgbouncer::example' do
     expect(chef_run).to create_user('pgbouncer')
   end
 
-  it "should install pgbouncer" do
+  it 'should install pgbouncer' do
     expect(chef_run).to install_package('pgbouncer')
   end
 

@@ -47,9 +47,7 @@ action :stop do
 end
 
 action :setup do
-
   group new_resource.group do
-
   end
 
   user new_resource.user do
@@ -65,17 +63,17 @@ action :setup do
 
   service "pgbouncer-#{new_resource.db_alias}" do
     provider Chef::Provider::Service::Upstart
-    supports :enable => true, :start => true, :restart => true
+    supports enable: true, start: true, restart: true
     action :nothing
   end
 
   # create the log, pid, db_sockets, /etc/pgbouncer, and application socket directories
   [
-   new_resource.log_dir,
-   new_resource.pid_dir,
-   new_resource.socket_dir,
-   ::File.expand_path(::File.join(new_resource.socket_dir, new_resource.db_alias)),
-   '/etc/pgbouncer'
+    new_resource.log_dir,
+    new_resource.pid_dir,
+    new_resource.socket_dir,
+    ::File.expand_path(::File.join(new_resource.socket_dir, new_resource.db_alias)),
+    '/etc/pgbouncer'
   ].each do |dir|
     directory dir do
       action :create
@@ -95,7 +93,7 @@ action :setup do
   properties = new_resource.methods.inject({}) do |memo, method|
     next memo unless method.to_s =~ /\_set\_or\_return_.*/
 
-    property = method.to_s.gsub("_set_or_return_","")
+    property = method.to_s.gsub('_set_or_return_', '')
     value = new_resource.send(property.to_sym)
     next memo if value.nil?
 
@@ -129,12 +127,11 @@ action :setup do
 end
 
 action :teardown do
-
   { "/etc/pgbouncer/userlist-#{new_resource.db_alias}.txt" => 'etc/pgbouncer/userlist.txt.erb',
     "/etc/pgbouncer/pgbouncer-#{new_resource.db_alias}.ini" => 'etc/pgbouncer/pgbouncer.ini.erb',
     "/etc/init/pgbouncer-#{new_resource.db_alias}.conf" => 'etc/pgbouncer/pgbouncer.conf',
     "/etc/logrotate.d/pgbouncer-#{new_resource.db_alias}" => 'etc/logrotate.d/pgbouncer-logrotate.d'
-  }.each do |destination_file, source_template|
+  }.each do |destination_file, _source_template|
     file destination_file do
       action :delete
     end

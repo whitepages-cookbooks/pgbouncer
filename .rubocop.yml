@@ -1,0 +1,13 @@
+AllCops:
+  Exclude:
+    - foodcritic/**/*
+    - vendor/**/*
+
+Metrics/LineLength:
+  Max: 200
+
+Style/SingleSpaceBeforeFirstArg:
+  Enabled: false
+
+Style/WordArray:
+  MinSize: 5

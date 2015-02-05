@@ -39,7 +39,7 @@ desc 'Run ChefSpec unit tests'
 RSpec::Core::RakeTask.new(:spec)
 
 # The default rake task should just run the fast tests.
-task default: ['style', 'spec']
+task default: %w(style spec)
 
 begin
   require 'kitchen/rake_tasks'
