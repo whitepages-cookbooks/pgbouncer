@@ -24,7 +24,7 @@ describe 'pgbouncer::example' do
     /etc/pgbouncer/db_sockets
     /var/log/pgbouncer
     /var/run/pgbouncer
-    /etc/pgbouncer/db_sockets/example
+    /etc/pgbouncer/db_sockets
   ).each do |dir|
     describe file(dir) do
       it { should be_directory }

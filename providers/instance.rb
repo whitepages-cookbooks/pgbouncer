@@ -72,7 +72,6 @@ action :setup do
     new_resource.log_dir,
     new_resource.pid_dir,
     new_resource.socket_dir,
-    ::File.expand_path(::File.join(new_resource.socket_dir, new_resource.instance_name)),
     '/etc/pgbouncer'
   ].each do |dir|
     directory dir do
@@ -81,6 +80,7 @@ action :setup do
       owner new_resource.user
       group new_resource.group
       mode 0775
+      not_if { dir.empty? }
     end
   end
 

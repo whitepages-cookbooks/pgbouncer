@@ -31,7 +31,6 @@ describe 'pgbouncer::example' do
     /etc/pgbouncer/db_sockets
     /var/log/pgbouncer
     /var/run/pgbouncer
-    /etc/pgbouncer/db_sockets/example
   ).each do |dir|
     it "creates directory #{dir}" do
       expect(chef_run).to create_directory(dir).with(
@@ -39,6 +38,10 @@ describe 'pgbouncer::example' do
         group:  'pgbouncer'
       )
     end
+  end
+
+  it 'does not create empty directory' do
+    expect(chef_run).to_not create_directory('')
   end
 
   %w(
