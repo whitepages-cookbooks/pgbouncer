@@ -1,6 +1,6 @@
 [databases]
 <% @databases.each do |database| %>
-<%= database[:db_alias] %> = host=<%= database[:db_host] %> port=<%= database[:db_port] %> dbname=<%= database[:db_name] %> <%= "connect_query='#{@connect_query}'" unless @connect_query.nil? || @connect_query.empty? %>
+<%= database[:db_alias] %> = <% "host='#{database[:db_host]}' " unless database[:db_host].nil? || database[:db_host].empty? %>port=<%= database[:db_port] %> dbname=<%= database[:db_name] %> <%= "connect_query='#{@connect_query}'" unless @connect_query.nil? || @connect_query.empty? %>
 <% end %>
 
 [pgbouncer]
