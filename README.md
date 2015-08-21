@@ -1,8 +1,8 @@
-PGBouncer Cookbook [![Build Status](https://travis-ci.org/whitepages-cookbooks/pgbouncer.png?branch=master)](https://travis-ci.org/whitepages-cookbooks/pgbouncer)
+PGBouncer Cookbook
 ==================
 
-This cookbook provides a [Chef LWRP](http://docs.opscode.com/lwrp.html) that sets up 
-a basic [PGBouncer](http://wiki.postgresql.org/wiki/PgBouncer) connection pool that 
+This cookbook provides a [Chef LWRP](http://docs.opscode.com/lwrp.html) that sets up
+a basic [PGBouncer](http://wiki.postgresql.org/wiki/PgBouncer) connection pool that
 fronts a Postgresql database.  It has example configuration for integration on client machines,
 exposing a local *nix socket that routes to a downstream database on another host.
 
@@ -28,46 +28,67 @@ Dependencies
 Resources/Providers
 ===================
 
-This cookbook exposes a single resource/provider pair, referred as `pgbouncer_connection`.  A basic 
+This cookbook exposes a single resource/provider pair, referred as `pgbouncer_instance`.  A basic
 example of its use can be found in `recipes/example.rb`, and is outlined below.
 
-`pgbouncer_connection`
+`pgbouncer_instance`
 ----------------------
 
 Sets up an Upstart service for pgbouncer against a single database alias, then starts the service.
 Multiple aliases may be supported on a single host.
 
 ### Actions
-- :setup: configure a pgbouncer service for the specified database alias (default action)
+- :setup: configure a pgbouncer service for the specified databases (default action)
 - :start: start the configured pgbouncer service
 - :stop: stop the configured pgbouncer service
 - :teardown: delete the configuration (FIXME: may not be comprehensive)
 
 ### Examples
+    # Define all database aliases
+    databases_list = [
+      {
+        db_alias: 'master',
+        db_host: 'master.example.com',
+        db_port: 6432,
+        db_name: 'test_database'
+      },
+      {
+        db_alias: 'replica',
+        db_host: 'replica.example.com',
+        db_port: 6432,
+        db_name: 'test_database'
+      }
+    ]
+
     # setup and start a read-only connection pool
-    pgbouncer_connection "database_example_com_ro" do
-      db_host "database.example.com"
-      db_port "6432"
-      db_name "test_database"
+    pgbouncer_instance "example" do
+      databases databases_list
       userlist "readonly_user" => "md500000000000000000000000000000000"
       max_client_conn 100
       default_pool_size 20
       action [:setup, :start]
     end
 
-    # setup and start a read-write connection pool
-    pgbouncer_connection "database_example_com_rw" do
-      db_host "database.example.com"
-      db_port "6432"
-      db_name "test_database"
+    # setup a read-write connection pool with different attributes
+    pgbouncer_instance "example_attributes" do
+      databases databases_list
       userlist "readwrite_user" => "md500000000000000000000000000000000", "readonly_user" => "md500000000000000000000000000000000"
-      max_client_conn 100
-      default_pool_size 20
-      action [:setup, :start]
+      max_client_conn 50
+      default_pool_size 10
+      listen_addr '127.0.0.1'
+      listen_port '15440'
+      server_reset_query ''
+      additional ({ ignore_startup_parameters: 'application_name,extra_float_digits'})
+      action :setup
     end
 
-    # stop a connection pool
-    pgbouncer_connection "database_example_com_ro" do
+    # stop a pgbouncer instance
+    pgbouncer_instance "example" do
+      action :stop
+    end
+
+    # start a pgbouncer instance
+    pgbouncer_instance "example_attributes" do
       action :stop
     end
 
@@ -91,24 +112,40 @@ Testing
 
 This cookbook has been "Tested in Production"&trade;, but also has some basic RSpec tests.
 
-**NOTE**: because Chef 10 has cookbook naming expectations, the root repo expects to be in a folder
-named 'pgbouncer'.
+Run ChefSpec unit tests
 
       bundle install
-      bundle exec rake spec
+      rake spec
 
-The cookbook is clean under FoodCritic.
+Run Kitchen tests
 
       bundle install
-      bundle exec rake foodcritic
+      rake kitchen
 
-To see the installation end to end, we've also got a rake task that spins up a [chef-zero](https://github.com/jkeiser/chef-zero)
-local instance, uploads the cookbooks via berkshelf, and spins up a vagrant instance that pulls the data down.  This is using a new
-Vagrant plugin, created here at Whitepages, called [vagrant-chefzero](https://github.com/whitepages/vagrant-chefzero/).
+The cookbook is clean under Rubocop and FoodCritic.
 
-      vagrant plugin install vagrant-chefzero
       bundle install
-      bundle exec rake vagrant_startup
+      rake style
+
+To see the installation end to end, you can use kitchen to converge and verify recipes [test kitchen](http://kitchen.ci/)
+local instance, uploads the cookbooks via berkshelf, and spins up a kitchen instance that pulls the data down.
+
+List available instances
+
+      bundle install
+      kitchen list
+
+Converge an instance
+
+      kitchen converge [instance name]
+
+Run the tests
+
+      kitchen verify [instance name]
+
+Delete an instance
+
+      kitchen destroy [instance name]
 
 License and Author(s)
 =====================
@@ -117,8 +154,11 @@ License and Author(s)
 - Author:: Jack Foy (<jfoy@whitepages.com>)
 - Author:: Paul Kohan (<pkohan@whitepages.com>)
 - Author:: Brian Engelman (<bengelman@whitepages.com>)
+- Author:: Dorian Zaccaria (<dorian@datadoghq.com>)
 
 Copyright 2010-2013, [Whitepages Inc.](http://www.whitepages.com/)
+
+Copyright 2015, [Datadog Inc.](http://www.datadoghq.com/)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

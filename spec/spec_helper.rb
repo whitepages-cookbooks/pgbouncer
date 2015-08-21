@@ -1,18 +1,20 @@
+# Encoding: utf-8
 require 'chefspec'
+require 'chefspec/berkshelf'
+require_relative 'support/matchers'
 
-{ :be_created => :create }.each do |matcher, action|
-  RSpec::Matchers.define matcher do
-    match do |resource|
-      success = false
-      if resource.action.respond_to?(:select)
-        success = resource.action.select { |a| a.to_s == action.to_s }.length > 0
-      else
-        success = resource.action.to_s == action.to_s
-      end
-    end
+RSpec.configure do |config|
+  # # Specify the path for Chef Solo to find roles (default: [ascending search])
+  # config.role_path = '/var/roles'
 
-    failure_message_for_should do |actual|
-      "expected that action :#{actual.action} would be :#{action}"
-    end
-  end
+  # prevent any WARN messages during testing
+  config.log_level = :error
+
+  # Specify the operating platform to mock Ohai data from (default: nil)
+  config.platform = 'ubuntu'
+
+  # Specify the operating version to mock Ohai data from (default: nil)
+  config.version = '12.04'
 end
+
+at_exit { ChefSpec::Coverage.report! }

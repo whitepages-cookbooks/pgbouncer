@@ -1,128 +1,49 @@
-require 'rubygems'
-require 'bundler'
-Bundler.setup
+# Encoding: utf-8
+require 'bundler/setup'
+require 'kitchen'
 
-require 'chef_zero/server'
+namespace :style do
+  require 'rubocop/rake_task'
+  desc 'Run Ruby style checks'
+  RuboCop::RakeTask.new(:ruby)
 
-def shell_output(cmd)
-  IO.popen(cmd) do |buffer|
-    buffer.each { |line| puts line }
+  require 'foodcritic'
+  desc 'Run Chef style checks'
+  FoodCritic::Rake::LintTask.new(:chef)
+end
+
+desc 'Run all style checks'
+task style: ['style:ruby', 'style:chef', 'food_extra']
+
+desc 'Run Test Kitchen integration tests'
+task :integration do
+  Kitchen.logger = Kitchen.default_file_logger
+  Kitchen::Config.new.instances.each do |instance|
+    instance.test(:always)
   end
 end
 
-desc "Runs foodcritic linter"
-
-task :foodcritic do
-  puts "Running foodcritic..."
-  puts `foodcritic --epic-fail any ./`
-  puts "...complete"
+desc 'Build AMI'
+task :build_ami do
+  sh 'rm -rf vendor/'
+  sh 'berks vendor vendor/cookbooks; packer build packer/build.json'
 end
 
-task :default => ['spec', 'foodcritic']
-
-desc "Runs spec tests"
-
-task :spec do
-  puts 'Running rspec...'
-  puts `rspec spec/`
-  puts '...complete'
+desc 'Run extra Foodcritic rulesets'
+task :food_extra do
+  sh 'if [ \'$(ls -A foodcritic/)\' ]; then bundle exec foodcritic -f any -I foodcritic/* .; fi'
 end
 
+require 'rspec/core/rake_task'
+desc 'Run ChefSpec unit tests'
+RSpec::Core::RakeTask.new(:spec)
 
-namespace :chef_zero do
-  desc "start up a chef_zero server"
-  task :start do
-    puts "starting chef-zero server at 0.0.0.0:8889"
+# The default rake task should just run the fast tests.
+task default: %w(style spec)
 
-    @server = ChefZero::Server.new(:host => '0.0.0.0', :port => 8889)
-    @server.start_background
-
-    puts "chef-zero started"
-  end
-
-  desc "stop a previously started chef_zero server"
-  task :stop do
-    puts "stopping chef-zero"
-    @server.stop if @server
-    puts "stopped"
-  end
-
-  desc "start a server, wait for enter, stops the server"
-  task :run do
-    Rake::Task['chef_zero:start'].invoke
-    print "Press Enter to stop..."
-    $stdin.gets.chomp
-    Rake::Task['chef_zero:stop'].invoke
-  end
-end
-
-namespace :berks do
-  desc "upload cookbooks via berkshelf to your chef_zero server"
-  task :upload do
-    puts "using berkshelf to upload cookbooks"
-    shell_output "berks upload --config=./test/config.json"
-    puts "complete"
-  end
-
-  desc "validates that the berkshelf cookbooks are on the chef_zero server"
-  task :validate do
-    puts "validating the chef_zero instance"
-    valid = `cd test; knife cookbook list --key .chef/test.pem | grep pgbouncer | wc -l; cd ..`
-    valid = valid.gsub(/\s+/,"").to_i
-    if valid == 0
-       puts "Ruh roh..."
-    else
-       puts "You're g2g"
-    end
-     
-    puts "...done"
-  end
-
-  desc "tests berkshelf"
-  task :test do
-    puts "testing"
-    Rake::Task['chef_zero:start'].invoke
-    Rake::Task['berks:upload'].invoke
-    Rake::Task['berks:validate'].invoke
-    Rake::Task['chef_zero:stop'].invoke
-  end
-end
-
-namespace :vagrant do
-  desc "starts up a vagrant instance"
-  task :up do
-    puts "spinning up vagrant host"
-    shell_output "cd test; vagrant up; cd .."
-    puts "...complete"
-  end
-
-  task :halt do
-    puts "Halting vagrant default instance..."
-    shell_output "cd test; vagrant halt; cd .."
-    puts "...complete"
-  end
-
-  task :destroy do
-    puts "Destroying vagrant default instance..."
-    shell_output "cd test; vagrant destroy --force; cd .."
-    puts "...complete"
-  end
-
-  task :provision do
-    puts "Reprovisioning the vagrant default instance..."
-    shell_output "cd test; vagrant provision; cd .."
-    puts "...complete"
-  end
-end
-
-desc "Spins up a chef-zero server, deploys the cookbook via berkshelf and sets up a vagrant host to fetch the cookbook"
-task :vagrant_startup do
-  puts "starting up"
-  Rake::Task['vagrant:up'].invoke
-end
-
-desc "Spins up a chef-zero server, deploys the cookbook via berkshelf and provisions a vagrant host to fetch the cookbook"
-task :vagrant_reprovision do
-  puts "starting up"
-  Rake::Task['vagrant:provision'].invoke
+begin
+  require 'kitchen/rake_tasks'
+  Kitchen::RakeTasks.new
+  rescue LoadError
+    puts '>>>>> Kitchen gem not loaded, omitting tasks' unless ENV['CI']
 end

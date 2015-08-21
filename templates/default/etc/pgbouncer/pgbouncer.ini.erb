@@ -1,204 +1,39 @@
-;; database name = connect string
-;;
-;; connect string params:
-;;   dbname= host= port= user= password=
-;;   client_encoding= datestyle= timezone=
-;;   pool_size= connect_query=
 [databases]
-<%= @db_alias %> = host=<%= @db_host %> port=<%= @db_port %> dbname=<%= @db_name %> <%= "connect_query='#{@connect_query}'" unless @connect_query.nil? || @connect_query.empty? %>
- 
-;; Configuration section
+<% @databases.each do |database| %>
+<%= database[:db_alias] %> = <% "host='#{database[:db_host]}' " unless database[:db_host].nil? || database[:db_host].empty? %>port=<%= database[:db_port] %> dbname=<%= database[:db_name] %> <%= "connect_query='#{@connect_query}'" unless @connect_query.nil? || @connect_query.empty? %>
+<% end %>
+
 [pgbouncer]
- 
-;;;
-;;; Administrative settings
-;;;
- 
-logfile = <%= @log_dir %>/pgbouncer-<%= @db_alias %>.log
-pidfile = <%= @pid_dir %>/pgbouncer-<%= @db_alias %>.pid
- 
-;;;
-;;; Where to wait for clients
-;;;
- 
-; ip address or * which means all ip-s
+
+logfile = <%= @log_dir %>/pgbouncer-<%= @instance_name %>.log
+pidfile = <%= @pid_dir %>/pgbouncer-<%= @instance_name %>.pid
+
 <%= ";" if @listen_addr.nil? || @listen_addr.empty? %>listen_addr = <%= @listen_addr %>
 <%= ";" if @listen_port.nil? || @listen_port.empty? %>listen_port = <%= @listen_port %>
- 
- 
-; unix socket is also used for -R.
-; On debian it should be /var/run/postgresql
-unix_socket_dir = <%= @socket_dir %>/<%= @db_alias %>/
- 
-;;;
-;;; Authentication settings
-;;;
- 
-; any, trust, plain, crypt, md5
-auth_type = md5
-auth_file = /etc/pgbouncer/userlist-<%= @db_alias %>.txt
- 
-;;;
-;;; Users allowed into database 'pgbouncer'
-;;;
- 
-; comma-separated list of users, who are allowed to change settings
-admin_users = pgbouncer_admin
- 
-; comma-separated list of users who are just allowed to use SHOW command
-stats_users = pgbouncer_monitor
- 
-;;;
-;;; Pooler personality questions
-;;;
- 
-; When server connection is released back to pool:
-;   session      - after client disconnects
-;   transaction  - after transaction finishes
-;   statement    - after statement finishes
+
+unix_socket_dir = <%= "#{@socket_dir}/" unless @socket_dir.empty? %>
+
+auth_type = <%= @auth_type %>
+auth_file = /etc/pgbouncer/userlist-<%= @instance_name %>.txt
+
+admin_users = <%= @admin_users.join(',') %>
+stats_users = <%= @stats_users.join(',') %>
+
 pool_mode = <%= @pool_mode %>
- 
-;
-; Query for cleaning connection immediately after releasing from client.
-; No need to put ROLLBACK here, pgbouncer does not reuse connections
-; where transaction is left open.
-;
-; Query for 8.3+:
-;   DISCARD ALL;
-;
-; Older versions:
-;   RESET ALL; SET SESSION AUTHORIZATION DEFAULT
-;
-; Empty if transaction pooling is in use.
-;
+
 server_reset_query = <%= @server_reset_query %>
- 
-; Comma-separated list of parameters to ignore when given
-; in startup packet.  Newer JDBC versions require the
-; extra_float_digits here.
-;
-;ignore_startup_parameters = extra_float_digits
- 
-;
-; When taking idle server into use, this query is ran first.
-;   SELECT 1
-;
-;server_check_query = select 1
- 
-; If server was used more recently that this many seconds ago,
-; skip the check query.  Value 0 may or may not run in immediately.
-;server_check_delay = 30
- 
-;;;
-;;; Connection limits
-;;;
- 
-; total number of clients that can connect
+
 max_client_conn = <%= @max_client_conn %>
- 
-; default pool size.  20 is good number when transaction pooling
-; is in use, in session pooling it needs to be the number of
-; max clients you want to handle at any moment
 default_pool_size = <%= @default_pool_size %>
 min_pool_size = <%= @min_pool_size %>
- 
-; how many additional connection to allow in case of trouble
 reserve_pool_size = <%= @reserve_pool_size %>
- 
-; if a clients needs to wait more than this many seconds, use reserve pool
-;reserve_pool_timeout = 3
- 
-; log if client connects or server connection is made
-;log_connections = <%#= @log_connections %>
- 
-; log if and why connection was closed
-;log_disconnections = <%#= @log_disconnections %>
- 
-; log error messages pooler sends to clients
-;log_pooler_errors = 1
- 
- 
-; If off, then server connections are reused in LIFO manner
-server_round_robin = 1
- 
-;;;
-;;; Timeouts
-;;;
-;; Close server connection if its been connected longer.
-;server_lifetime = 1200
- 
-;; Close server connection if its not been used in this time.
-;; Allows to clean unnecessary connections from pool after peak.
+server_round_robin = <%= @server_round_robin %>
 server_idle_timeout = <%= @server_idle_timeout %>
- 
-;; Cancel connection attempt if server does not answer takes longer.
-;server_connect_timeout = 15
- 
-;; If server login failed (server_connect_timeout or auth failure)
-;; then wait this many second.
-;server_login_retry = 15
- 
-;; Dangerous.  Server connection is closed if query does not return
-;; in this time.  Should be used to survive network problems,
-;; _not_ as statement_timeout. (default: 0)
-;query_timeout = 0
- 
-;; Dangerous.  Client connection is closed if the query is not assigned
-;; to a server in this time.  Should be used to limit the number of queued
-;; queries in case of a database or network failure. (default: 0)
-;query_wait_timeout = 0
- 
-;; Dangerous.  Client connection is closed if no activity in this time.
-;; Should be used to survive network problems. (default: 0)
-;client_idle_timeout = 0
- 
-;; Disconnect clients who have not managed to log in after connecting
-;; in this many seconds.
-;client_login_timeout = 60
- 
-;; Clean automatically created database entries (via "*") if they
-;; stay unused in this many seconds.
-; autodb_idle_timeout = 3600
- 
-;;;
-;;; Low-level tuning options
-;;;
- 
-;; buffer for streaming packets
-;pkt_buf = 2048
- 
-;; man 2 listen
-;listen_backlog = 128
- 
-;; networking options, for info: man 7 tcp
- 
-;; Linux: notify program about new connection only if there
-;; is also data received.  (Seconds to wait.)
-;; On Linux the default is 45, on other OS'es 0.
-;tcp_defer_accept = 0
- 
-;; In-kernel buffer size (Linux default: 4096)
-;tcp_socket_buffer = 0
- 
-;; whether tcp keepalive should be turned on (0/1)
-<%= defined?(@tcp_keepalive) ? "tcp_keepalive = #{@tcp_keepalive}" : ";tcp_keepalive = 1" %>
 
-;; following options are Linux-specific.
-;; they also require tcp_keepalive=1
- 
-;; count of keepaliva packets
-;tcp_keepcnt = 0
- 
-;; how long the connection can be idle,
-;; before sending keepalive packets
+<%= defined?(@tcp_keepalive) ? "tcp_keepalive = #{@tcp_keepalive}" : ";tcp_keepalive = 1" %>
 <%= defined?(@tcp_keepidle) ? "tcp_keepidle = #{@tcp_keepidle}" : ";tcp_keepidle = 0" %>
- 
-;; The time between individual keepalive probes.
 <%= defined?(@tcp_keepintvl) ? "tcp_keepintvl = #{@tcp_keepintvl}" : ";tcp_keepintvl = 0" %>
 
- 
-;; DNS lookup caching time
-;dns_max_ttl = 15
- 
-;; DNS zone SOA lookup period
-;dns_zone_check_period = 0
+<% @additional.each do |key, value| %>
+<%= key %> = <%= value %>
+<% end %>
