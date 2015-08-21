@@ -63,7 +63,7 @@ action :setup do
 
   service "pgbouncer-#{new_resource.instance_name}" do
     provider Chef::Provider::Service::Upstart
-    supports enable: true, start: true, restart: true
+    supports enable: true, start: true, restart: true, reload: true
     action :nothing
   end
 
@@ -118,7 +118,7 @@ action :setup do
       owner new_resource.user
       group new_resource.group
       mode 0644
-      notifies :restart, "service[pgbouncer-#{new_resource.instance_name}]"
+      notifies :reload, "service[pgbouncer-#{new_resource.instance_name}]"
       variables(properties)
     end
   end
