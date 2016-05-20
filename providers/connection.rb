@@ -25,7 +25,6 @@ end
 action :start do
   service "pgbouncer-#{new_resource.db_alias}-start" do
     service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
-    provider Chef::Provider::Service::Upstart
     action [:enable, :start]
   end
 end
@@ -33,7 +32,6 @@ end
 action :restart do
   service "pgbouncer-#{new_resource.db_alias}-restart" do
     service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
-    provider Chef::Provider::Service::Upstart
     action [:enable, :restart]
   end
 end
@@ -41,7 +39,6 @@ end
 action :stop do
   service "pgbouncer-#{new_resource.db_alias}-stop" do
     service_name "pgbouncer-#{new_resource.db_alias}" # this is to eliminate warnings around http://tickets.opscode.com/browse/CHEF-3694
-    provider Chef::Provider::Service::Upstart
     action :stop
   end
 end
@@ -64,7 +61,6 @@ action :setup do
   end
 
   service "pgbouncer-#{new_resource.db_alias}" do
-    provider Chef::Provider::Service::Upstart
     supports :enable => true, :start => true, :restart => true
     action :nothing
   end
@@ -125,6 +121,29 @@ action :setup do
     end
   end
 
+  # build the systemd conf templates
+  if ['redhat', 'centos', 'fedora', 'amazon'].include?(node['platform'])
+    template "/etc/init.d/pgbouncer-#{new_resource.db_alias}" do
+      cookbook 'pgbouncer'
+      source "etc/init.d/pgbouncer.erb"
+      owner 'root'
+      group 'root'
+      mode 0755
+      notifies :restart, "service[pgbouncer-#{new_resource.db_alias}]"
+      variables(properties)
+    end
+
+    template "/etc/sysconfig/pgbouncer-#{new_resource.db_alias}" do
+      cookbook 'pgbouncer'
+      source "etc/sysconfig/pgbouncer.erb"
+      owner 'root'
+      group 'root'
+      mode 0644
+      notifies :restart, "service[pgbouncer-#{new_resource.db_alias}]"
+      variables(properties)
+    end
+  end
+
   new_resource.updated_by_last_action(true)
 end
 
@@ -132,11 +151,22 @@ action :teardown do
 
   { "/etc/pgbouncer/userlist-#{new_resource.db_alias}.txt" => 'etc/pgbouncer/userlist.txt.erb',
     "/etc/pgbouncer/pgbouncer-#{new_resource.db_alias}.ini" => 'etc/pgbouncer/pgbouncer.ini.erb',
-    "/etc/init/pgbouncer-#{new_resource.db_alias}.conf" => 'etc/pgbouncer/pgbouncer.conf',
+    "/etc/init/pgbouncer-#{new_resource.db_alias}.conf" => 'etc/init/pgbouncer.conf.erb',
     "/etc/logrotate.d/pgbouncer-#{new_resource.db_alias}" => 'etc/logrotate.d/pgbouncer-logrotate.d'
   }.each do |destination_file, source_template|
     file destination_file do
       action :delete
+    end
+  end
+
+  # build the systemd conf templates
+  if ['redhat', 'centos', 'fedora', 'amazon'].include?(node['platform'])
+    { "/etc/init.d/pgbouncer-#{new_resource.db_alias}" => 'etc/init.d/pgbouncer.erb',
+      "/etc/sysconfig/pgbouncer-#{new_resource.db_alias}" => 'etc/sysconfig/pgbouncer.erb'
+    }.each do |destination_file, source_template|
+      file destination_file do
+        action :delete
+      end
     end
   end
 
